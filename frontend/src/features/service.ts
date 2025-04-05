@@ -8,6 +8,7 @@ import {
   PhotosQuery,
   Register,
 } from "./models";
+import { photoListTestData } from "./testData";
 
 const api = axios.create({
   baseURL: "https://api.example.com",
@@ -27,8 +28,8 @@ async function logoutUser(): Promise<void> {
 }
 
 async function fetchPhotos(params: PhotosQuery): Promise<PhotoListResponse> {
-  const response = await api.get("/photos", { params });
-  return PhotoListResponse.parse(response.data);
+  // const response = await api.get("/photos", { params });
+  return PhotoListResponse.parse(photoListTestData);
 }
 
 async function uploadPhoto(data: FormData): Promise<void> {

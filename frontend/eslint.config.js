@@ -11,7 +11,7 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: ["dist", "src/ui"],
+    ignores: ["dist", "src/components/ui"],
   },
   eslint.configs.recommended,
   {

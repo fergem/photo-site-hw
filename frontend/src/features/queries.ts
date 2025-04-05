@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 
 import { Login, PhotosQuery, Register, UploadPhoto } from "./models";
 import { service } from "./service";
@@ -7,7 +8,13 @@ export const useRegisterUser = () =>
   useMutation({ mutationFn: (data: Register) => service.registerUser(data) });
 
 export const useLoginUser = () =>
-  useMutation({ mutationFn: (data: Login) => service.loginUser(data) });
+  useMutation({
+    mutationFn: (data: Login) => service.loginUser(data),
+    onSuccess: (response) => {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + response.token;
+    },
+  });
 
 export const useLogoutUser = () =>
   useMutation({ mutationFn: () => service.logoutUser() });
