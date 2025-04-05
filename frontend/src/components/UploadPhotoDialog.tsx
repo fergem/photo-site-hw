@@ -72,7 +72,6 @@ export function UploadPhotoDialog() {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="name"

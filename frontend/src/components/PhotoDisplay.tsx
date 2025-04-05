@@ -4,14 +4,18 @@ import { Photo } from "@/features/models";
 
 interface PhotoDisplayProps {
   photo: Photo;
+  setOpen: () => void;
 }
 
-export function PhotoDisplay({ photo }: PhotoDisplayProps) {
+export function PhotoDisplay({ photo, setOpen }: PhotoDisplayProps) {
   const { name, upload_date, url } = photo;
   const formattedDate = dayjs(upload_date).format("YYYY-MM-DD");
 
   return (
-    <div className="flex flex-col items-center justify-center col-span-1 hover:scale-105 transition-transform duration-200 cursor-pointer">
+    <div
+      onClick={setOpen}
+      className="flex flex-col items-center justify-center col-span-1 hover:scale-105 transition-transform duration-200 cursor-pointer"
+    >
       <img
         src={url}
         alt={name}

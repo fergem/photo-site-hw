@@ -1,6 +1,6 @@
 import { useFetchPhotos } from "@/features/queries";
 
-import { PhotoDisplay } from "./PhotoDisplay";
+import { PhotoDetailsDialog } from "./PhotoDetailsDialog";
 import { QueryLoader } from "./QueryLoader";
 
 export function PhotoList() {
@@ -16,7 +16,7 @@ export function PhotoList() {
         {(loadedQuery) => (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {loadedQuery.data.map((photo) => (
-              <PhotoDisplay key={photo.id} photo={photo} />
+              <PhotoDetailsDialog key={photo.id} photo={photo} />
             ))}
           </div>
         )}
