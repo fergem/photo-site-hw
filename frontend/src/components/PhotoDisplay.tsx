@@ -11,7 +11,7 @@ export function PhotoDisplay({ photo }: PhotoDisplayProps) {
   const formattedDate = dayjs(upload_date).format("YYYY-MM-DD");
 
   return (
-    <div className="flex flex-col items-center justify-center col-span-1 hover:scale-105 transition-transform duration-200 hover::cursor-pointer">
+    <div className="flex flex-col items-center justify-center col-span-1 hover:scale-105 transition-transform duration-200 cursor-pointer">
       <img
         src={url}
         alt={name}
