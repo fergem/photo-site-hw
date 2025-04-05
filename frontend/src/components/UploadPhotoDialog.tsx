@@ -39,6 +39,8 @@ export function UploadPhotoDialog() {
 
   function onSubmit(values: UploadPhoto) {
     console.log(values);
+    uploadPhoto.mutate(values);
+    setOpen(false);
   }
 
   return (

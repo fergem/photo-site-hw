@@ -4,7 +4,7 @@ import { UploadPhotoDialog } from "./components/UploadPhotoDialog";
 
 function App() {
   return (
-    <div className="flex flex-col h-dvh">
+    <div className="flex flex-col h-dvh bg-accent">
       <Header />
       <PhotoList />
       <UploadPhotoDialog />

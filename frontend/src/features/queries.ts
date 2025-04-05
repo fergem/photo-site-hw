@@ -12,7 +12,7 @@ export const useRegisterUser = () =>
 export const useLoginUser = () => {
   const setBearer = useSetAtom(bearerAtom);
 
-  useMutation({
+  return useMutation({
     mutationFn: (data: Login) => service.loginUser(data),
     onSuccess: (response) => {
       axios.defaults.headers.common["Authorization"] =
