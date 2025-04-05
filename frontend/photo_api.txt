@@ -1,0 +1,177 @@
+openapi: 3.0.3
+info:
+  title: Photo Management API
+  description: API for uploading, listing, and managing photos with user authentication.
+  version: 1.0.0
+servers:
+  - url: https://api.example.com
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                  format: password
+      responses:
+        '201':
+          description: User registered successfully
+  
+  /auth/login:
+    post:
+      summary: Login a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Login successful, returns JWT token
+  
+  /auth/logout:
+    post:
+      summary: Logout the user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User logged out successfully
+
+  /photos:
+    get:
+      summary: List all photos sorted by name or date with pagination
+      parameters:
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [name, date]
+            default: name
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: Returns a paginated list of photos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                          minLength: 40
+                        upload_date:
+                          type: string
+                          format: date-time
+                        url:
+                          type: string
+                          format: uri
+    post:
+      summary: Upload a new photo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 40
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Photo uploaded successfully
+
+  /photos/{photoId}:
+    get:
+      summary: Retrieve a photo by ID
+      parameters:
+        - name: photoId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the photo metadata with URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                    minLength: 40
+                  upload_date:
+                    type: string
+                    format: date-time
+                  url:
+                    type: string
+                    format: uri
+    delete:
+      summary: Delete a photo by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: photoId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Photo deleted successfully
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
