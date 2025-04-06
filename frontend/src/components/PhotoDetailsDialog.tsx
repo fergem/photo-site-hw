@@ -24,7 +24,7 @@ export function PhotoDetailsDialog({ photo }: PhotoDetailsDialogProp) {
   const { name, uploadDate, url } = photo;
   const [open, setOpen] = useState(false);
   const deletePhoto = useDeletePhotoById();
-  const formattedDate = dayjs(uploadDate).format("YYYY-MM-DD");
+  const formattedDate = dayjs(uploadDate).format("YYYY-MM-DD HH:mm");
 
   const handleDelete = () => {
     deletePhoto.mutate(photo.id);
