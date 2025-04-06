@@ -57,9 +57,9 @@ class PhotoController(val photoRepository: PhotoRepository) {
     fun getAllPhotos(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") limit: Int,
-        @RequestParam(defaultValue = "name") sortBy: String
+        @RequestParam(defaultValue = "name") sort: String
     ): PhotoPage {
-        val pageable = PageRequest.of(page, limit, Sort.by(sortBy))
+        val pageable = PageRequest.of(page, limit, Sort.by(if (sort == "date") "uploadDate" else sort))
         return PhotoPage(photoRepository.findAll(pageable))
     }
 
