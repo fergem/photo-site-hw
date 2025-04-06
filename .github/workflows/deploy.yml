@@ -31,6 +31,23 @@ jobs:
         working-directory: backend
         run: ./gradlew packageForEb
 
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: 'yarn'
+          cache-dependency-path: frontend/yarn.lock
+      
+      - name: Install dependencies
+        working-directory: frontend
+        run: yarn install
+      
+      - name: Build frontend
+        working-directory: frontend
+        run: yarn build
+        env:
+          VITE_API_URL: http://cloud-assignment-photo-backend.eu-central-1.elasticbeanstalk.com
+      
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
