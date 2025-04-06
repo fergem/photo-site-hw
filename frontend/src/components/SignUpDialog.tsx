@@ -49,7 +49,7 @@ export function SignUpDialog() {
           <DialogTitle>Sign Up</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={void form.handleSubmit(onSubmit)}>
+          <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
             <div className="flex flex-col gap-4 py-4">
               <FormField
                 control={form.control}

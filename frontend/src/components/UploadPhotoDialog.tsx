@@ -15,7 +15,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import Dropzone from "./ui/dropzone";
 import {
   Form,
   FormControl,
@@ -43,10 +42,12 @@ export function UploadPhotoDialog() {
     setOpen(false);
   }
 
+  const fileRef = form.register("file");
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {!open && (
-        <DialogTrigger className="absolute bottom-10 right-10">
+        <DialogTrigger className="absolute bottom-10 right-10" asChild>
           <Button>
             <div className="flex flex-row gap-2">
               <Upload />
@@ -60,15 +61,25 @@ export function UploadPhotoDialog() {
           <DialogTitle>Upload photo</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={void form.handleSubmit(onSubmit)}>
+          <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
             <div className="flex flex-col gap-4 py-4">
               <FormField
                 control={form.control}
                 name="file"
-                render={({ field }) => (
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                render={({ field: { value, onChange, ...fieldProps } }) => (
                   <FormItem>
+                    <FormLabel>Picture</FormLabel>
                     <FormControl>
-                      <Dropzone {...field} />
+                      <Input
+                        {...fieldProps}
+                        placeholder="Picture"
+                        type="file"
+                        accept="image/*, application/pdf"
+                        onChange={(event) =>
+                          onChange(event.target.files && event.target.files[0])
+                        }
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

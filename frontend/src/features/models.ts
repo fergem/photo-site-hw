@@ -19,7 +19,7 @@ export type LoginResponse = z.infer<typeof LoginResponse>;
 
 export const Photo = z.object({
   id: z.string(),
-  name: z.string().min(40),
+  name: z.string().max(40),
   upload_date: z.string().datetime(),
   url: z.string().url(),
 });
@@ -34,7 +34,7 @@ export const PhotoListResponse = z.object({
 export type PhotoListResponse = z.infer<typeof PhotoListResponse>;
 
 export const UploadPhoto = z.object({
-  name: z.string().min(40),
+  name: z.string().max(40),
   file: z.instanceof(File),
 });
 export type UploadPhoto = z.infer<typeof UploadPhoto>;

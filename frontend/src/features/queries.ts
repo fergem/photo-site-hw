@@ -38,6 +38,7 @@ export const useUploadPhoto = () => {
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("file", data.file);
+      console.log("formData", formData);
       return service.uploadPhoto(formData);
     },
     onSuccess: async () => {

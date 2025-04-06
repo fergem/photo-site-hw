@@ -8,10 +8,10 @@ import {
   PhotosQuery,
   Register,
 } from "./models";
-import { photoListTestData } from "./testData";
 
 const api = axios.create({
-  baseURL: "https://api.example.com",
+  baseURL:
+    "http://cloud-assignment-photo-backend.eu-central-1.elasticbeanstalk.com",
 });
 
 async function registerUser(data: Register): Promise<void> {
@@ -20,7 +20,7 @@ async function registerUser(data: Register): Promise<void> {
 
 async function loginUser(data: Login): Promise<LoginResponse> {
   const response = await api.post("/auth/login", data);
-  return LoginResponse.parse(response.data);
+  return LoginResponse.parse(await response.data);
 }
 
 async function logoutUser(): Promise<void> {
@@ -28,8 +28,8 @@ async function logoutUser(): Promise<void> {
 }
 
 async function fetchPhotos(params: PhotosQuery): Promise<PhotoListResponse> {
-  // const response = await api.get("/photos", { params });
-  return PhotoListResponse.parse(photoListTestData);
+  const response = await api.get("/photos", { params });
+  return PhotoListResponse.parse(await response.data);
 }
 
 async function uploadPhoto(data: FormData): Promise<void> {
@@ -40,7 +40,7 @@ async function uploadPhoto(data: FormData): Promise<void> {
 
 async function fetchPhotoById(photoId: string): Promise<Photo> {
   const response = await api.get(`/photos/${photoId}`);
-  return Photo.parse(response.data);
+  return Photo.parse(await response.data);
 }
 
 async function deletePhotoById(photoId: string): Promise<void> {
