@@ -28,12 +28,6 @@ export default tseslint.config(
               message: "Please import from features/hooks/useStore.ts instead.",
             },
           ],
-          patterns: [
-            {
-              group: ["@radix-ui/*"],
-              message: "Please import from Shadcn instead.",
-            },
-          ],
         },
       ],
     },

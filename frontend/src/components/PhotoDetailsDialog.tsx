@@ -1,5 +1,4 @@
 import dayjs from "dayjs";
-import { Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { Photo } from "@/features/models";
@@ -11,6 +10,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -21,15 +21,13 @@ interface PhotoDetailsDialogProp {
 }
 
 export function PhotoDetailsDialog({ photo }: PhotoDetailsDialogProp) {
-  const { name, upload_date, url } = photo;
+  const { name, uploadDate, url } = photo;
   const [open, setOpen] = useState(false);
-  const [showDelete, setShowDelete] = useState(false);
   const deletePhoto = useDeletePhotoById();
-  const formattedDate = dayjs(upload_date).format("YYYY-MM-DD");
+  const formattedDate = dayjs(uploadDate).format("YYYY-MM-DD");
 
   const handleDelete = () => {
     deletePhoto.mutate(photo.id);
-    setShowDelete(false);
     setOpen(false);
   };
 
@@ -51,23 +49,18 @@ export function PhotoDetailsDialog({ photo }: PhotoDetailsDialogProp) {
           </div>
         </DialogHeader>
 
-        <div
-          className="h-[32rem] w-full relative"
-          onMouseEnter={() => setShowDelete(true)}
-          onMouseLeave={() => setShowDelete(false)}
-        >
-          <img src={url} alt={name} className="w-full h-full object-cover" />
-          {showDelete && (
-            <Button
-              size="icon"
-              variant="outline"
-              className="absolute top-2 right-2"
-              onClick={handleDelete}
-            >
-              <Trash2 />
-            </Button>
-          )}
+        <div className="h-[32rem] w-full relative">
+          <img
+            src={url}
+            alt={name}
+            className="w-full h-full object-cover  rounded-lg"
+          />
         </div>
+        <DialogFooter>
+          <Button variant="destructive" onClick={handleDelete}>
+            Delete
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -44,7 +44,7 @@ export function UploadPhotoDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {!open && (
-        <DialogTrigger className="absolute bottom-10 right-10" asChild>
+        <DialogTrigger className="fixed bottom-10 right-10" asChild>
           <Button>
             <div className="flex flex-row gap-2">
               <Upload />

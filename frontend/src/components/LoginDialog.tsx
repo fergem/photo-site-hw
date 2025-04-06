@@ -35,7 +35,6 @@ export function LoginDialog() {
   });
 
   function onSubmit(values: Login) {
-    console.log(values);
     login.mutate(values);
   }
 

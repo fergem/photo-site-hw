@@ -35,7 +35,6 @@ export function SignUpDialog() {
   });
 
   function onSubmit(values: Register) {
-    console.log(values);
     register.mutate(values);
   }
 

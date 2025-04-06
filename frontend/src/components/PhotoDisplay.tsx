@@ -8,8 +8,8 @@ interface PhotoDisplayProps {
 }
 
 export function PhotoDisplay({ photo, setOpen }: PhotoDisplayProps) {
-  const { name, upload_date, url } = photo;
-  const formattedDate = dayjs(upload_date).format("YYYY-MM-DD");
+  const { name, uploadDate, url } = photo;
+  const formattedDate = dayjs(uploadDate).format("YYYY-MM-DD");
 
   return (
     <div

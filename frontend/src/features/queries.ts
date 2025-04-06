@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useSetAtom } from "jotai/react";
+import { useAtomValue, useSetAtom } from "jotai/react";
 
 import { bearerAtom } from "./bearerAtom";
-import { Login, PhotosQuery, Register, UploadPhoto } from "./models";
+import { Login, Register, UploadPhoto } from "./models";
+import { photosQueryAtom } from "./photosQueryAtom";
 import { service } from "./service";
 
 export const useRegisterUser = () =>
@@ -25,11 +26,14 @@ export const useLoginUser = () => {
 export const useLogoutUser = () =>
   useMutation({ mutationFn: () => service.logoutUser() });
 
-export const useFetchPhotos = (params: PhotosQuery) =>
-  useQuery({
+export const useFetchPhotos = () => {
+  const params = useAtomValue(photosQueryAtom);
+
+  return useQuery({
     queryKey: ["photos", params],
     queryFn: () => service.fetchPhotos(params),
   });
+};
 
 export const useUploadPhoto = () => {
   const queryClient = useQueryClient();
@@ -38,7 +42,6 @@ export const useUploadPhoto = () => {
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("file", data.file);
-      console.log("formData", formData);
       return service.uploadPhoto(formData);
     },
     onSuccess: async () => {
