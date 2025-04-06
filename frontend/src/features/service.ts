@@ -10,8 +10,7 @@ import {
 } from "./models";
 
 const api = axios.create({
-  baseURL:
-    "http://cloud-assignment-photo-backend.eu-central-1.elasticbeanstalk.com",
+  baseURL: import.meta.env.VITE_API_URL as string,
 });
 
 async function registerUser(data: Register): Promise<void> {
