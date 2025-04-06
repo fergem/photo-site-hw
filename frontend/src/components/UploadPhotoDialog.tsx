@@ -37,12 +37,9 @@ export function UploadPhotoDialog() {
   });
 
   function onSubmit(values: UploadPhoto) {
-    console.log(values);
     uploadPhoto.mutate(values);
     setOpen(false);
   }
-
-  const fileRef = form.register("file");
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
