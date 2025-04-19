@@ -49,6 +49,21 @@ resource "aws_iam_policy" "s3_policy" {
   })
 }
 
+resource "aws_iam_policy" "cognito_confirm_policy" {
+  name = "beanstalk-cognito-policy"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "VisualEditor1",
+        "Effect" : "Allow",
+        "Action" : "cognito-idp:AdminConfirmSignUp",
+        "Resource" : ["*"]
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role" "beanstalk_instance_role" {
   name = "beanstalk-ec2-role"
 
@@ -72,6 +87,11 @@ resource "aws_iam_role_policy_attachment" "beanstalk_ec2_policy" {
 resource "aws_iam_role_policy_attachment" "beanstalk_s3_policy" {
   role       = aws_iam_role.beanstalk_instance_role.name
   policy_arn = aws_iam_policy.s3_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "beanstalk_cognito_policy" {
+  role       = aws_iam_role.beanstalk_instance_role.name
+  policy_arn = aws_iam_policy.cognito_confirm_policy.arn
 }
 
 resource "aws_iam_instance_profile" "beanstalk_instance_profile" {

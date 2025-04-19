@@ -22,6 +22,18 @@ resource "aws_elastic_beanstalk_environment" "backend_environment" {
     value     = aws_iam_instance_profile.beanstalk_instance_profile.name
   }
 
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "COGNITO_USER_POOL_ID"
+    value     = aws_cognito_user_pool.this.id
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "COGNITO_CLIENT_ID"
+    value     = aws_cognito_user_pool_client.this.id
+  }
+
 }
 
 resource "terraform_data" "backend_version" {
