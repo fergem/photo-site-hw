@@ -37,32 +37,3 @@ resource "aws_s3_bucket_website_configuration" "static_site_web" {
   }
   
 }
-
-resource "aws_s3_object" "frontend_js_assets_s3_object" {
-    for_each = fileset("../frontend/dist/assets", "**.js")
-  bucket = aws_s3_bucket.static_site.id
-  key    = "assets/${each.value}"
-  source = "../frontend/dist/assets/${each.value}"
-  content_type = "text/javascript"
-}
-
-resource "aws_s3_object" "frontend_css_assets_s3_object" {
-    for_each = fileset("../frontend/dist/assets", "**.css")
-  bucket = aws_s3_bucket.static_site.id
-  key    = "assets/${each.value}"
-  source = "../frontend/dist/assets/${each.value}"
-  content_type = "text/css"
-}
-
-resource "aws_s3_object" "frontend_index_s3_object" {
-  bucket = aws_s3_bucket.static_site.id
-  key    = "index.html"
-  source = "../frontend/dist/index.html"
-  content_type = "text/html"
-}
-
-resource "aws_s3_object" "frontend_icon_s3_object" {
-  bucket = aws_s3_bucket.static_site.id
-  key    = "vite.svg"
-  source = "../frontend/dist/vite.svg"
-}
