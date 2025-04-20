@@ -1,6 +1,8 @@
 import { atomWithStorage } from "jotai/utils";
 
-export const bearerAtom = atomWithStorage<string | undefined>(
+import { LoginResponse } from "./models";
+
+export const bearerAtom = atomWithStorage<LoginResponse | undefined>(
   "bearer",
   undefined
 );

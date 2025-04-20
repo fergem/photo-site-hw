@@ -9,41 +9,67 @@ import {
   Register,
 } from "./models";
 
-const createApiClient = () => axios.create({
+const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL as string,
 });
 
+function getToken(): string | null {
+  const storedValue = localStorage.getItem("bearer");
+
+  if (storedValue) {
+    const response = JSON.parse(storedValue) as LoginResponse;
+    return response.token;
+  }
+
+  return storedValue;
+}
+
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = getToken();
+
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  async (error: Error) => {
+    await Promise.reject(error);
+  }
+);
+
 async function registerUser(data: Register): Promise<void> {
-  await createApiClient().post("/auth/register", data);
+  await apiClient.post("/auth/register", data);
 }
 
 async function loginUser(data: Login): Promise<LoginResponse> {
-  const response = await createApiClient().post("/auth/login", data);
+  const response = await apiClient.post("/auth/login", data);
   return LoginResponse.parse(await response.data);
 }
 
 async function logoutUser(): Promise<void> {
-  await createApiClient().post("/auth/logout");
+  await apiClient.post("/auth/logout");
 }
 
 async function fetchPhotos(params: PhotosQuery): Promise<PhotoListResponse> {
-  const response = await createApiClient().get("/photos", { params });
+  const response = await apiClient.get("/photos", { params });
   return PhotoListResponse.parse(await response.data);
 }
 
 async function uploadPhoto(data: FormData): Promise<void> {
-  await createApiClient().post("/photos", data, {
+  await apiClient.post("/photos", data, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 }
 
 async function fetchPhotoById(photoId: string): Promise<Photo> {
-  const response = await createApiClient().get(`/photos/${photoId}`);
+  const response = await apiClient.get(`/photos/${photoId}`);
   return Photo.parse(await response.data);
 }
 
 async function deletePhotoById(photoId: string): Promise<void> {
-  await createApiClient().delete(`/photos/${photoId}`);
+  await apiClient.delete(`/photos/${photoId}`);
 }
 
 export const service = {

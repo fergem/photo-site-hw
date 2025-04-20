@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { useAtomValue, useSetAtom } from "jotai/react";
 
 import { bearerAtom } from "./bearerAtom";
@@ -7,18 +6,20 @@ import { Login, Register, UploadPhoto } from "./models";
 import { photosQueryAtom } from "./photosQueryAtom";
 import { service } from "./service";
 
-export const useRegisterUser = () =>
-  useMutation({ mutationFn: (data: Register) => service.registerUser(data) });
+export const useRegisterUser = ({ onSuccess }: { onSuccess: () => void }) =>
+  useMutation({
+    mutationFn: (data: Register) => service.registerUser(data),
+    onSuccess,
+  });
 
-export const useLoginUser = () => {
+export const useLoginUser = ({ onSuccess }: { onSuccess: () => void }) => {
   const setBearer = useSetAtom(bearerAtom);
 
   return useMutation({
     mutationFn: (data: Login) => service.loginUser(data),
     onSuccess: (response) => {
-      axios.defaults.headers.common["Authorization"] =
-        "Bearer " + response.token;
-      setBearer(response.token);
+      setBearer(response);
+      onSuccess();
     },
   });
 };

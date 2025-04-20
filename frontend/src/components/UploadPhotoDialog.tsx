@@ -1,8 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAtomValue } from "jotai";
 import { Upload } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { bearerAtom } from "@/features/bearerAtom";
 import { UploadPhoto } from "@/features/models";
 import { useUploadPhoto } from "@/features/queries";
 
@@ -29,6 +31,8 @@ export function UploadPhotoDialog() {
   const [open, setOpen] = useState(false);
   const uploadPhoto = useUploadPhoto();
 
+  const bearer = useAtomValue(bearerAtom);
+
   const form = useForm<UploadPhoto>({
     defaultValues: {
       name: "",
@@ -41,9 +45,11 @@ export function UploadPhotoDialog() {
     setOpen(false);
   }
 
+  const bearerPresent = !!bearer;
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {!open && (
+      {!open && bearerPresent && (
         <DialogTrigger className="fixed bottom-10 right-10" asChild>
           <Button>
             <div className="flex flex-row gap-2">
