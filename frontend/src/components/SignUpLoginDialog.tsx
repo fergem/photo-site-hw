@@ -24,7 +24,7 @@ export function SignUpLoginDialog() {
           Register
         </Button>
       </DialogTrigger>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button
           variant="default"
           onClick={() => setTabState(SignUpLoginDialogTabsType.LOGIN)}
