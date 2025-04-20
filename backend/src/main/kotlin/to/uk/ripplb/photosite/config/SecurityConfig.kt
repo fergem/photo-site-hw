@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
@@ -36,13 +37,14 @@ class SecurityConfig {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
             .authorizeHttpRequests { auth ->                         // open /auth, secure the rest
-                auth.requestMatchers("/auth/**").permitAll()
+                auth.requestMatchers("/auth/**").permitAll().requestMatchers(AntPathRequestMatcher("/photos/**", "GET")).permitAll()
                     .anyRequest().authenticated()
             }
-            .securityMatcher("/photos/**")
-            .oauth2ResourceServer { oauth2 ->                        // JWT validation filter
-                oauth2.jwt()
+            .securityMatchers{
+                it.requestMatchers(AntPathRequestMatcher("/photos", "POST"))
+                    .requestMatchers(AntPathRequestMatcher("/photos/**", "DELETE"))
             }
+            .oauth2ResourceServer { it.jwt() }
 
         return http.build()
     }
