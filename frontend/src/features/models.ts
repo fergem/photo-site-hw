@@ -1,13 +1,13 @@
 import { z } from "zod";
 
 export const Register = z.object({
-  username: z.string(),
+  username: z.string().email(),
   password: z.string(),
 });
 export type Register = z.infer<typeof Register>;
 
 export const Login = z.object({
-  username: z.string(),
+  username: z.string().email(),
   password: z.string(),
 });
 export type Login = z.infer<typeof Login>;

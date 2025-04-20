@@ -44,7 +44,7 @@ export function SignUpForm({ onSuccess }: SignUpFormProps) {
             name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Username</FormLabel>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input placeholder="username" {...field} />
                 </FormControl>
