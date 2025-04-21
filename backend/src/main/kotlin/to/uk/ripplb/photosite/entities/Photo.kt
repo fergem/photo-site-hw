@@ -11,4 +11,5 @@ class Photo(
     val name: String,
     val url: String?,
     val uploadDate: LocalDateTime = LocalDateTime.now(),
+    val numberOfPeople: Int = -1,
 )

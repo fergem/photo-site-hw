@@ -4,6 +4,7 @@ resource "aws_s3_bucket" "code_versions" {
 
 resource "aws_s3_bucket" "photos" {
   bucket = "bme-cloud-assignment-photos"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_public_access_block" "photos_public_access" {

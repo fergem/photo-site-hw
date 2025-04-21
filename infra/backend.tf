@@ -34,6 +34,63 @@ resource "aws_elastic_beanstalk_environment" "backend_environment" {
     value     = aws_cognito_user_pool_client.this.id
   }
 
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DB_HOST"
+    value     = aws_rds_cluster_instance.serverless_v2.endpoint
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DB_PORT"
+    value     = aws_rds_cluster_instance.serverless_v2.port
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DB_NAME"
+    value     = local.db_name
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DB_USERNAME"
+    value     = local.db_username
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DB_PASSWORD"
+    value     = local.db_password
+  }
+
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "VPCId"
+    value     = data.aws_vpc.default.id
+  }
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "Subnets"
+    value     = join(",", data.aws_subnets.private.ids)
+  }
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "ELBSubnets"
+    value     = join(",", data.aws_subnets.private.ids)
+  }
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "SecurityGroups"
+    value     = aws_security_group.beanstalk.id
+  }
+
+}
+
+resource "aws_security_group" "beanstalk" {
+  name        = "cloud-photo-backend-app-sg"
+  description = "Beanstalk instances SG"
+  vpc_id      = data.aws_vpc.default.id
 }
 
 resource "terraform_data" "backend_version" {
