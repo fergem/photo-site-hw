@@ -2,6 +2,10 @@ resource "aws_s3_bucket" "code_versions" {
   bucket = "bme-cloud-assignment-code-versions"
 }
 
+output "backend_bucket_name" {
+  value = aws_s3_bucket.code_versions.bucket
+}
+
 resource "aws_s3_bucket" "photos" {
   bucket = "bme-cloud-assignment-photos"
   force_destroy = true

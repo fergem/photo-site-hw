@@ -12,7 +12,7 @@ resource "aws_security_group" "aurora" {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
-    security_groups = [aws_security_group.beanstalk.id]
+    security_groups = [aws_security_group.beanstalk.id, aws_security_group.lambda_sg.id]
   }
   egress {
     from_port   = 0
@@ -33,6 +33,7 @@ resource "aws_rds_cluster" "aurora" {
   db_subnet_group_name    = aws_db_subnet_group.aurora.name
   vpc_security_group_ids  = [aws_security_group.aurora.id]
   skip_final_snapshot     = true
+  enable_http_endpoint    = true
 
   serverlessv2_scaling_configuration  {
     max_capacity             = 1

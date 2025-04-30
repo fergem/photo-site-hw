@@ -65,6 +65,12 @@ resource "aws_elastic_beanstalk_environment" "backend_environment" {
   }
 
   setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "SQS_URL"
+    value     = aws_sqs_queue.yolo_queue.id
+  }
+
+  setting {
     namespace = "aws:ec2:vpc"
     name      = "VPCId"
     value     = data.aws_vpc.default.id
@@ -97,15 +103,9 @@ resource "terraform_data" "backend_version" {
   input = local.backend_version
 }
 
-resource "aws_s3_object" "backend_s3_object" {
-  bucket = aws_s3_bucket.code_versions.id
-  key    = "backend-v${terraform_data.backend_version.output}.zip"
-  source = local.backend_artifact
-}
-
 resource "aws_elastic_beanstalk_application_version" "backend_version" {
   name        = "backend-v${terraform_data.backend_version.output}"
   application = aws_elastic_beanstalk_application.backend_application.name
   bucket      = aws_s3_bucket.code_versions.id
-  key         = aws_s3_object.backend_s3_object.id
+  key         = "app-v${terraform_data.backend_version.output}.zip"
 }

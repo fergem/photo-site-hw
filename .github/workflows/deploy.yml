@@ -12,7 +12,7 @@ env:
   AWS_DEFAULT_REGION: eu-central-1
 
 jobs:
-  build_backend_and_infra:
+  chicken_infra:
     runs-on: ubuntu-latest
 
     defaults:
@@ -23,30 +23,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            backend_version:
-              - 'backend/version.txt'
-
-      - name: Set up JDK
-        if: steps.filter.outputs.backend_version == 'true'
-        uses: actions/setup-java@v3
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Make Gradle wrapper executable
-        if: steps.filter.outputs.backend_version == 'true'
-        run: chmod +x gradlew
-        working-directory: backend
-
-      - name: Run Gradle build
-        if: steps.filter.outputs.backend_version == 'true'
-        working-directory: backend
-        run: ./gradlew packageForEb
-      
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
@@ -55,12 +31,92 @@ jobs:
         working-directory: infra
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: |
+          terraform apply -auto-approve -target="aws_s3_bucket.photo_site_frontend_bucket"
+          terraform apply -auto-approve -target="aws_s3_bucket.code_versions"
+          terraform apply -auto-approve -target="aws_s3_bucket.static_site"
+          terraform apply -auto-approve -target="aws_ecr_repository.yolo_lambda_repo"
         working-directory: infra
+
+  upload_backend:
+    runs-on: ubuntu-latest
+    needs: chicken_infra
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+        working-directory: backend
+
+      - name: Run Gradle build
+        working-directory: backend
+        run: ./gradlew packageForEb
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: infra
+      
+      - name: Upload to S3
+        run: aws s3 sync ./backend/build/distributions "s3://$(terraform -chdir=infra output -raw backend_bucket_name)"
 
   upload_frontend:
     runs-on: ubuntu-latest
-    needs: build_backend_and_infra
+    needs: chicken_infra
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: 'yarn'
+          cache-dependency-path: frontend/yarn.lock
+      
+      - name: Install dependencies
+        working-directory: frontend
+        run: yarn install
+        
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: infra
+      
+      - name: Build frontend
+        working-directory: frontend
+        run: yarn build
+        env:
+          VITE_API_URL: http://cloud-assignment-photo-backend.eu-central-1.elasticbeanstalk.com
+      
+      - name: Upload to S3
+        run: aws s3 sync ./frontend/dist "s3://$(terraform -chdir=infra output -raw frontend_bucket_name)" --delete
+
+
+  upload_lambda_image:
+    runs-on: ubuntu-latest
+    needs: chicken_infra
 
     defaults:
       run:
@@ -74,30 +130,53 @@ jobs:
         id: filter
         with:
           filters: |
-            frontend:
-              - 'frontend/**'
+            lambda_image:
+              - 'process/**'
+        
+      - name: Set up Terraform
+        if: steps.filter.outputs.lambda_image == 'true'
+        uses: hashicorp/setup-terraform@v3
 
-      - name: Set up Node.js 22
-        if: steps.filter.outputs.frontend == 'true'
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
-          cache: 'yarn'
-          cache-dependency-path: frontend/yarn.lock
-      
-      - name: Install dependencies
-        if: steps.filter.outputs.frontend == 'true'
-        working-directory: frontend
-        run: yarn install
-      
-      - name: Build frontend
-        if: steps.filter.outputs.frontend == 'true'
-        working-directory: frontend
-        run: yarn build
-        env:
-          VITE_API_URL: http://cloud-assignment-photo-backend.eu-central-1.elasticbeanstalk.com
-      
-      - name: Upload to S3
-        if: steps.filter.outputs.frontend == 'true'
-        working-directory: frontend
-        run: aws s3 sync ./dist s3://photo-site-frontend-bucket --delete
+      - name: Terraform Init
+        if: steps.filter.outputs.lambda_image == 'true'
+        run: terraform init
+        working-directory: infra
+
+      - name: Build and push Docker image
+        if: steps.filter.outputs.lambda_image == 'true'
+        working-directory: process
+        run: |
+          docker build -t yolo-lambda .
+          ECR_URL=$(terraform -chdir=../infra output -raw ecr_url)
+          aws ecr get-login-password | docker login --username AWS --password-stdin 430561522708.dkr.ecr.eu-central-1.amazonaws.com
+          docker tag yolo-lambda:latest $ECR_URL:latest
+          docker push $ECR_URL:latest
+
+  egg_infra:
+    runs-on: ubuntu-latest
+    needs: [ upload_lambda_image, upload_frontend, upload_backend ]
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: infra
+
+      - name: Terraform Apply
+        run: |
+          terraform apply -auto-approve
+        working-directory: infra
+
+      - name: Force update lambda
+        run: |
+          aws lambda update-function-code --function-name yolo-lambda --image-uri $(terraform -chdir=infra output -raw ecr_url):latest
+        

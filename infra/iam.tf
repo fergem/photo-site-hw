@@ -32,8 +32,6 @@ resource "aws_iam_policy_attachment" "beanstalk_admin_policy_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess-AWSElasticBeanstalk"
 }
 
-
-
 resource "aws_iam_policy" "s3_policy" {
   name = "beanstalk-s3-policy"
   policy = jsonencode({
@@ -44,6 +42,21 @@ resource "aws_iam_policy" "s3_policy" {
         "Effect" : "Allow",
         "Action" : "s3:*",
         "Resource" : ["arn:aws:s3:::${aws_s3_bucket.photos.id}", "arn:aws:s3:::${aws_s3_bucket.photos.id}/*"]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "sqs_policy" {
+  name = "beanstalk-sqs-policy"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "VisualEditor1",
+        "Effect" : "Allow",
+        "Action" : "sqs:sendmessage",
+        "Resource" : [aws_sqs_queue.yolo_queue.arn]
       }
     ]
   })
@@ -87,6 +100,11 @@ resource "aws_iam_role_policy_attachment" "beanstalk_ec2_policy" {
 resource "aws_iam_role_policy_attachment" "beanstalk_s3_policy" {
   role       = aws_iam_role.beanstalk_instance_role.name
   policy_arn = aws_iam_policy.s3_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "beanstalk_sqs_policy" {
+  role       = aws_iam_role.beanstalk_instance_role.name
+  policy_arn = aws_iam_policy.sqs_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "beanstalk_cognito_policy" {

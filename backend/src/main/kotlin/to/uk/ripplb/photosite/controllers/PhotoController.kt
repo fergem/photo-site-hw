@@ -1,5 +1,6 @@
 package to.uk.ripplb.photosite.controllers
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -14,6 +15,8 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import software.amazon.awssdk.services.sqs.SqsClient
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest
 import to.uk.ripplb.photosite.entities.Photo
 import java.util.UUID
 
@@ -26,6 +29,9 @@ class PhotoController(val photoRepository: PhotoRepository) {
 
     @Value("\${aws.region}")
     lateinit var region: String
+
+    @Value("\${aws.sqs.url}")
+    lateinit var sqsUrl: String
 
     private fun getS3Client(): S3Client {
         return S3Client.builder()
@@ -43,7 +49,9 @@ class PhotoController(val photoRepository: PhotoRepository) {
             .key(key)
             .build()
         s3.putObject(request, RequestBody.fromInputStream(file.inputStream, file.size))
-        val photo = Photo(id, name, "https://$bucket.s3.$region.amazonaws.com/$key")
+        val url = "https://$bucket.s3.$region.amazonaws.com/$key"
+        sendSqsMessage(id, url)
+        val photo = Photo(id, name, url)
         photoRepository.save(photo)
     }
 
@@ -69,6 +77,23 @@ class PhotoController(val photoRepository: PhotoRepository) {
         val request = DeleteObjectRequest.builder().bucket(bucket).key(id).build()
         s3.deleteObject(request)
         photoRepository.deleteById(id)
+    }
+
+    fun sendSqsMessage(id: String, s3Url: String) {
+        val sqsClient = SqsClient.builder()
+            .region(Region.of(region)) // adjust region
+            .build()
+
+        val messageBody = jacksonObjectMapper().writeValueAsString(
+            mapOf("id" to id, "url" to s3Url)
+        )
+
+        val request = SendMessageRequest.builder()
+            .queueUrl(sqsUrl)
+            .messageBody(messageBody)
+            .build()
+
+        sqsClient.sendMessage(request)
     }
 
 }
