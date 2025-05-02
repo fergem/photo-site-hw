@@ -50,7 +50,7 @@ class PhotoController(val photoRepository: PhotoRepository) {
             .build()
         s3.putObject(request, RequestBody.fromInputStream(file.inputStream, file.size))
         val url = "https://$bucket.s3.$region.amazonaws.com/$key"
-        sendSqsMessage(id, url)
+        sendSqsMessage(id, url, name)
         val photo = Photo(id, name, url)
         photoRepository.save(photo)
     }
@@ -79,13 +79,13 @@ class PhotoController(val photoRepository: PhotoRepository) {
         photoRepository.deleteById(id)
     }
 
-    fun sendSqsMessage(id: String, s3Url: String) {
+    fun sendSqsMessage(id: String, s3Url: String, name: String) {
         val sqsClient = SqsClient.builder()
             .region(Region.of(region)) // adjust region
             .build()
 
         val messageBody = jacksonObjectMapper().writeValueAsString(
-            mapOf("id" to id, "url" to s3Url)
+            mapOf("id" to id, "url" to s3Url, "desc" to name)
         )
 
         val request = SendMessageRequest.builder()

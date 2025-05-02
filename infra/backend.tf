@@ -71,6 +71,12 @@ resource "aws_elastic_beanstalk_environment" "backend_environment" {
   }
 
   setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "SNS_TOPIC_ARN"
+    value     = aws_sns_topic.email_alerts.arn
+  }
+
+  setting {
     namespace = "aws:ec2:vpc"
     name      = "VPCId"
     value     = data.aws_vpc.default.id

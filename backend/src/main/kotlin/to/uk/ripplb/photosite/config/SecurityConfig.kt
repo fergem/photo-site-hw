@@ -43,6 +43,7 @@ class SecurityConfig {
             .securityMatchers{
                 it.requestMatchers(AntPathRequestMatcher("/photos", "POST"))
                     .requestMatchers(AntPathRequestMatcher("/photos/**", "DELETE"))
+                    .requestMatchers("/subscribe")
             }
             .oauth2ResourceServer { it.jwt() }
 

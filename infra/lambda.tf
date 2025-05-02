@@ -120,6 +120,7 @@ resource "aws_lambda_function" "yolo_lambda" {
       DB_USER = local.db_username
       DB_PASS = local.db_password
       BUCKET = aws_s3_bucket.photos.bucket
+      TOPIC_ARN = aws_sns_topic.email_alerts.arn
     }
   }
 }
@@ -147,3 +148,25 @@ resource "aws_vpc_endpoint" "s3" {
     Name = "s3-endpoint"
   }
 }
+
+resource "aws_sns_topic" "email_alerts" {
+  name = "photo-process-email-alerts"
+}
+
+resource "aws_iam_policy" "lambda_sns_publish" {
+  name = "lambda-sns-publish"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Action = "sns:Publish",
+      Resource = aws_sns_topic.email_alerts.arn
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_sns_attach" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = aws_iam_policy.lambda_sns_publish.arn
+}
+

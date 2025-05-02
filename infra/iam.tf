@@ -70,7 +70,7 @@ resource "aws_iam_policy" "cognito_confirm_policy" {
       {
         "Sid" : "VisualEditor1",
         "Effect" : "Allow",
-        "Action" : "cognito-idp:AdminConfirmSignUp",
+        "Action" : "cognito-idp:*",
         "Resource" : ["*"]
       }
     ]

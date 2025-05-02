@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType
 
 @Service
 class AuthService {
@@ -51,4 +52,20 @@ class AuthService {
         }
         return true
     }
+
+    fun setSubscribedStatus(username: String, subscribed: Int) {
+        getCognitoClient().adminUpdateUserAttributes {
+            it.userPoolId(userPoolId)
+            it.username(username)
+            it.userAttributes(
+                listOf(
+                    AttributeType.builder()
+                        .name("custom:subscribed")
+                        .value(subscribed.toString())
+                        .build()
+                )
+            )
+        }
+    }
+
 }

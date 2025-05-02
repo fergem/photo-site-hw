@@ -8,6 +8,7 @@ from ultralytics import YOLO
 import os
 
 s3 = boto3.client("s3")
+sns = boto3.client("sns")
 model = YOLO("yolov8n.pt")
 
 DB_HOST = os.environ["DB_HOST"]
@@ -16,6 +17,7 @@ DB_NAME = os.environ["DB_NAME"]
 DB_USER = os.environ["DB_USER"]
 DB_PASS = os.environ["DB_PASS"]
 BUCKET = os.environ["BUCKET"]
+TOPIC_ARN = os.environ["TOPIC_ARN"]
 
 def lambda_handler(event, context):
     conn = psycopg2.connect(
@@ -31,6 +33,7 @@ def lambda_handler(event, context):
         msg = json.loads(record['body'])
         db_id = msg['id']
         s3_url = msg['url']
+        desc = msg['desc']
 
         key = s3_url.split("/")[-1]
 
@@ -60,6 +63,19 @@ def lambda_handler(event, context):
         print(f"Uploading image back to S3: {BUCKET=}, {key=}")
         s3.put_object(Bucket=BUCKET, Key=key, Body=buffer.tobytes(), ContentType='image/jpeg')
         print("Uploaded image back to S3")
+
+        print("Sending SNS message")
+        message = {
+            "url": s3_url,
+            "count": count
+        }
+
+        sns.publish(
+            TopicArn=TOPIC_ARN,
+            Message=json.dumps(message),
+            Subject=f"Person Detection Result - {desc}",
+        )
+        print("Sent SNS message")
 
         # Update DB by ID
         cur.execute("UPDATE Photo SET number_of_people = %s WHERE id = %s;", (count, db_id))
