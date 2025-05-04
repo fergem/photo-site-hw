@@ -26,7 +26,8 @@ export function PhotoDisplay({ photo, setOpen }: PhotoDisplayProps) {
       <p className="text-gray-500 text-xs select-none">
         {photo.numberOfPeople >= 0
           ? `${photo.numberOfPeople} people`
-          : "Nobody found"}
+          : "Nobody"}{" "}
+        found
       </p>
     </div>
   );
