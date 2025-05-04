@@ -41,7 +41,8 @@ resource "aws_cognito_user_pool_client" "this" {
   prevent_user_existence_errors = "ENABLED"
 
   read_attributes = [
-    "custom:subscribed"
+    "custom:subscribed",
+    "email",
   ]
 
   write_attributes = [

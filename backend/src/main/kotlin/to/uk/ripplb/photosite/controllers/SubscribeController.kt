@@ -43,7 +43,7 @@ class SubscribeController(val authService: AuthService) {
         principal: JwtAuthenticationToken,
         @RequestBody body: SubscriptionData
     ): ResponseEntity<Void> {
-        val username = principal.token.claims["username"]?.toString()
+        val username = principal.token.claims["email"]?.toString()
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
         if (body.value) {
             getSnsClient().subscribe(

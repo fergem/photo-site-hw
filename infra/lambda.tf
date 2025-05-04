@@ -7,6 +7,7 @@ resource "aws_ecr_repository" "yolo_lambda_repo" {
 # SQS Queue
 resource "aws_sqs_queue" "yolo_queue" {
   name = "yolo-image-queue"
+  visibility_timeout_seconds = 300
 }
 
 # IAM Role for Lambda
@@ -146,6 +147,17 @@ resource "aws_vpc_endpoint" "s3" {
 
   tags = {
     Name = "s3-endpoint"
+  }
+}
+
+resource "aws_vpc_endpoint" "sns" {
+  vpc_id            = data.aws_vpc.default.id
+  service_name      = "com.amazonaws.${data.aws_region.current.name}.sns"
+  vpc_endpoint_type = "Interface"
+  route_table_ids   = data.aws_route_tables.private.ids
+
+  tags = {
+    Name = "sns-endpoint"
   }
 }
 
