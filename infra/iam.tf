@@ -62,6 +62,21 @@ resource "aws_iam_policy" "sqs_policy" {
   })
 }
 
+resource "aws_iam_policy" "sns_policy" {
+  name = "beanstalk-sns-policy"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "VisualEditor1",
+        "Effect" : "Allow",
+        "Action" : "sns:*",
+        "Resource" : [aws_sns_topic.email_alerts.arn]
+      }
+    ]
+  })
+}
+
 resource "aws_iam_policy" "cognito_confirm_policy" {
   name = "beanstalk-cognito-policy"
   policy = jsonencode({
@@ -105,6 +120,11 @@ resource "aws_iam_role_policy_attachment" "beanstalk_s3_policy" {
 resource "aws_iam_role_policy_attachment" "beanstalk_sqs_policy" {
   role       = aws_iam_role.beanstalk_instance_role.name
   policy_arn = aws_iam_policy.sqs_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "beanstalk_sns_policy" {
+  role       = aws_iam_role.beanstalk_instance_role.name
+  policy_arn = aws_iam_policy.sns_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "beanstalk_cognito_policy" {

@@ -154,7 +154,8 @@ resource "aws_vpc_endpoint" "sns" {
   vpc_id            = data.aws_vpc.default.id
   service_name      = "com.amazonaws.${data.aws_region.current.name}.sns"
   vpc_endpoint_type = "Interface"
-  route_table_ids   = data.aws_route_tables.private.ids
+  subnet_ids        = data.aws_subnets.private.ids
+  private_dns_enabled = true
 
   tags = {
     Name = "sns-endpoint"
