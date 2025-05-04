@@ -22,6 +22,7 @@ export const Photo = z.object({
   name: z.string().max(40),
   uploadDate: z.string(),
   url: z.string().url(),
+  numberOfPeople: z.number(),
 });
 export type Photo = z.infer<typeof Photo>;
 
@@ -45,3 +46,9 @@ export const PhotosQuery = z.object({
   limit: z.number().min(1).max(100).default(10),
 });
 export type PhotosQuery = z.infer<typeof PhotosQuery>;
+
+export const SubscribtionState = z.object({
+  value: z.boolean(),
+});
+
+export type SubscribtionState = z.infer<typeof SubscribtionState>;

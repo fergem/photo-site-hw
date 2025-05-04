@@ -5,6 +5,7 @@ import { bearerAtom } from "@/features/bearerAtom";
 
 import { LogoutButton } from "./LogoutButton";
 import { SignUpLoginDialog } from "./SignUpLoginDialog";
+import { SubscribeButton } from "./SubsrcibeButton";
 
 export function Header() {
   const bearer = useAtomValue(bearerAtom);
@@ -16,7 +17,10 @@ export function Header() {
         <Camera className="mt-1" size={40} />
         <h1 className="text-2xl">Photo album</h1>
       </div>
+
       <nav className="flex items-center justify-end gap-2">
+        <SubscribeButton />
+
         {bearerPresent ? <LogoutButton /> : <SignUpLoginDialog />}
       </nav>
     </header>

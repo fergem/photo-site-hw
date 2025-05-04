@@ -7,6 +7,7 @@ import {
   PhotoListResponse,
   PhotosQuery,
   Register,
+  SubscribtionState,
 } from "./models";
 
 const apiClient = axios.create({
@@ -52,6 +53,15 @@ async function logoutUser(): Promise<void> {
   await apiClient.post("/auth/logout");
 }
 
+async function getSubscriptionState() {
+  const response = await apiClient.get(`/subscribe`);
+  return SubscribtionState.parse(await response.data);
+}
+
+async function setSubscriptionState(data: SubscribtionState) {
+  await apiClient.post(`/subscribe`, data);
+}
+
 async function fetchPhotos(params: PhotosQuery): Promise<PhotoListResponse> {
   const response = await apiClient.get("/photos", { params });
   return PhotoListResponse.parse(await response.data);
@@ -80,4 +90,6 @@ export const service = {
   uploadPhoto,
   fetchPhotoById,
   deletePhotoById,
+  getSubscriptionState,
+  setSubscriptionState,
 };

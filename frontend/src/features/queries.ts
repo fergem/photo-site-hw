@@ -66,3 +66,21 @@ export const useDeletePhotoById = () => {
     },
   });
 };
+
+export const useGetSubscriptionState = ({ enabled }: { enabled: boolean }) => {
+  return useQuery({
+    queryKey: ["subscription"],
+    queryFn: () => service.getSubscriptionState(),
+    enabled,
+  });
+};
+
+export const useSetSubscriptionState = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (value: boolean) => service.setSubscriptionState({ value }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["subscription"] });
+    },
+  });
+};

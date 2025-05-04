@@ -23,6 +23,11 @@ export function PhotoDisplay({ photo, setOpen }: PhotoDisplayProps) {
       />
       <h2 className="mt-1 text-lg font-semibold select-none">{name}</h2>
       <p className="text-gray-500 text-xs select-none">{formattedDate}</p>
+      <p className="text-gray-500 text-xs select-none">
+        {photo.numberOfPeople >= 0
+          ? `${photo.numberOfPeople} people`
+          : "Nobody found"}
+      </p>
     </div>
   );
 }
