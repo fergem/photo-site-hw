@@ -75,8 +75,8 @@ def lambda_handler(event, context):
             Message=json.dumps(message),
             Subject=f"Person Detection Result - {desc}",
         )
-        print("Sent SNS message")
 
+        print("Updating database")
         # Update DB by ID
         cur.execute("UPDATE Photo SET number_of_people = %s WHERE id = %s;", (count, db_id))
         conn.commit()

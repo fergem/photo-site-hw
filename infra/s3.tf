@@ -13,11 +13,17 @@ resource "aws_s3_bucket" "photos" {
 
 resource "aws_s3_bucket_public_access_block" "photos_public_access" {
   bucket = aws_s3_bucket.photos.id
+
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
 }
 
 resource "aws_s3_bucket_policy" "allow_public_access_policy" {
   bucket = aws_s3_bucket.photos.id
   policy = data.aws_iam_policy_document.allow_public_access_policy_document.json
+  depends_on = [ aws_s3_bucket_public_access_block.photos_public_access ]
 }
 
 data "aws_iam_policy_document" "allow_public_access_policy_document" {

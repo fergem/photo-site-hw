@@ -7,10 +7,6 @@ output "frontend_bucket_name" {
   value = aws_s3_bucket.static_site.bucket
 }
 
-resource "aws_s3_bucket_public_access_block" "static_site_public_access" {
-  bucket = aws_s3_bucket.static_site.id
-}
-
 resource "aws_s3_bucket_policy" "static_site_allow_public_read" {
   bucket = aws_s3_bucket.static_site.id
   policy = data.aws_iam_policy_document.frontend_allow_public_access_policy_document.json
@@ -31,6 +27,8 @@ data "aws_iam_policy_document" "frontend_allow_public_access_policy_document" {
       "${aws_s3_bucket.static_site.arn}/*",
     ]
   }
+
+  depends_on = [ aws_s3_bucket_public_access_block.frontend_public_access_block ]
 }
 
 resource "aws_s3_bucket_public_access_block" "frontend_public_access_block" {
