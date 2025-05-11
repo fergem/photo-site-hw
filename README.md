@@ -30,3 +30,32 @@ The model used for people detection has dependencies not available in standard A
 
 ## CI/CD
 The above described architecture is deployed on-demand with the help of Terraform, an IaC tool. Deployment is automatically triggered and run by Github actions. This combination easily allows rapid destruction of the environment, saving costs when not needed.
+
+## User workflow
+
+### Site after a fresh install
+![Site after a fresh install](pic/initial.png)
+
+### Signing up
+![Signing up](pic/register.png)
+
+### Site after logging in
+![Site after logging in](pic/after_login.png)
+
+### Uploading an image
+![Uploading an image](pic/upload.png)
+
+### Site after upload
+![Site after upload](pic/after_upload.png)
+
+### Site after multiple uploads and detection run
+![Site after multiple uploads and detection run](pic/after_detects.png)
+
+### Sorting by upload date
+![Sorting by upload date](pic/after_detects_sort.png)
+
+### Selecting a picture
+![Selecting a picture](pic/selected.png)
+
+### Deleting a picture
+![Deleting a picture](pic/deleted.png)
